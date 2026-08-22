@@ -1,0 +1,7 @@
+.site-header{background:var(--brown)!important}
+.site-header .nav-links{background:var(--brown);color:#fff}
+.site-header .nav-links a,.site-header .header-actions,.site-header .wordmark{color:#fff}
+.hero-button{background:var(--brown);border-color:var(--brown);color:#fff}
+.hero-button:hover{background:#fff;color:var(--brown)}
+.customizer-overlay{background:rgba(58,36,29,.82)}
+@media(max-width:800px){.site-header .nav-links{background:var(--brown)}}
