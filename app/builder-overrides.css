@@ -1,0 +1,7 @@
+.customizer-actions button{font-size:0!important;color:#2c2927!important;padding:0 9px}
+.customizer-actions button:first-child:after{content:"↥";font:25px Arial,sans-serif}
+.customizer-actions button:last-child:after{content:"↻";font:26px Arial,sans-serif}
+.customizer-top>button{font-size:0!important}
+.customizer-top>button:after{content:"×";font:34px Arial,sans-serif;font-weight:200}
+.customizer-options:before{content:"CAVA HAT";position:absolute;top:31px;right:28px;font:26px Arial,sans-serif;letter-spacing:.02em;color:#2c2927}
+@media(max-width:800px){.customizer-options:before{top:17px;right:7%;font-size:15px}}
