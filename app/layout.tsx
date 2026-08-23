@@ -4,6 +4,7 @@ import "./globals.css";
 import "./builder-overrides.css";
 import "./store-overrides.css";
 import "./color-overrides.css";
+import "./simple-builder.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
