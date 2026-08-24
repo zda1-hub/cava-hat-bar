@@ -25,14 +25,16 @@
    picker should receive drag gestures. This keeps every layer reachable. */
 .reference-render-layer:not(.is-active){pointer-events:none}
 .reference-render-layer.is-active{pointer-events:auto}
-.reference-layer-picker{position:absolute;top:18px;right:3%;z-index:14;display:flex;gap:5px;max-width:64%;overflow-x:auto;scrollbar-width:none}
-.reference-layer-picker::-webkit-scrollbar{display:none}
-.reference-layer-picker button{flex:0 0 auto;border:1px solid #b9b1a9;background:rgba(255,255,255,.94);color:#302a26;padding:7px 9px;font:600 10px/1 Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
-.reference-layer-picker button.active{border-color:#392c22;background:#392c22;color:#fff}
+.reference-layer-editor{position:sticky;top:-26px;z-index:9;margin:10px 0 0;padding:18px 0 16px;background:rgba(255,255,255,.97);border-bottom:1px solid #b9b1a9;box-shadow:0 8px 14px rgba(255,255,255,.92)}
+.reference-layer-editor>div{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:12px}
+.reference-layer-editor b{font-size:17px;letter-spacing:-.02em}.reference-layer-editor span{font-size:13px;color:#716b66}
+.reference-layer-editor select{width:100%;height:56px;border:2px solid #2b2724;border-radius:0;background:#fff;padding:0 16px;font-size:18px;color:#242424;cursor:pointer}
+.reference-layer-editor select:disabled{border-color:#b9b1a9;color:#8a8580;cursor:not-allowed}
+.reference-layer-editor p{margin:8px 0 0;font:italic 13px/1.35 Georgia,serif;color:#615b56}
 
 /* Rancher's small-accessory print area is about one tenth of the product
    canvas and sits at the lower-right edge of the crown. */
 .reference-charm-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(24%,9%) scale(.068);transform-origin:center;pointer-events:none}
 .reference-charm-transform img{width:100%;height:100%;object-fit:contain}
 
-@media(max-width:800px){.reference-layer-picker{top:auto;right:3%;bottom:39px;max-width:94%;padding-left:4px}.reference-layer-picker button{padding:6px 8px;font-size:9px}}
+@media(max-width:800px){.reference-layer-editor{top:-18px;margin-top:4px;padding:12px 0}.reference-layer-editor select{height:48px;font-size:16px}.reference-layer-editor p{font-size:12px}}
