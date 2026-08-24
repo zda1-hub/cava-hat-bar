@@ -32,7 +32,7 @@
 
 /* Rancher's small-accessory print area is about one tenth of the product
    canvas and sits at the lower-right edge of the crown. */
-.reference-charm-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(24%,9%) scale(.07);transform-origin:center;pointer-events:none}
+.reference-charm-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(24%,9%) scale(.068);transform-origin:center;pointer-events:none}
 .reference-charm-transform img{width:100%;height:100%;object-fit:contain}
 
 @media(max-width:800px){.reference-layer-picker{top:auto;right:3%;bottom:39px;max-width:94%;padding-left:4px}.reference-layer-picker button{padding:6px 8px;font-size:9px}}
