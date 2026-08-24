@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const hats = [
   ["The Sunday Stroll", "$138", "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=85"],
@@ -36,10 +36,13 @@ const featherAssets: Record<string, string> = { Pheasant: cowboyAsset("66ac111a0
 const charmAssets: Record<string, string> = { "Gold Horseshoe": cowboyAsset("9z5dtj.png"), "Silver Horseshoe": cowboyAsset("9z573r.png"), "Gold Cactus": cowboyAsset("9z4m5j.png"), "Silver Cactus": cowboyAsset("9z4svb.png"), "Gold Cowboy Boot": cowboyAsset("9z4co7.png"), "Gold Heart": cowboyAsset("9z4ppz.png"), Moon: cowboyAsset("9z5kjb.png"), Star: cowboyAsset("9z5xl3.png"), "Gold Snake": cowboyAsset("9z6b0n.png"), "Silver Snake": cowboyAsset("9z6hqf.png") };
 type RenderPosition = { x: number; y: number };
 type MovableLayer = "feather" | "base" | "layerOne" | "layerTwo" | "charm";
-function DraggableRender({ name, className, src, position, onMove, artworkClassName, active }: { name: string; className: string; src: string; position: RenderPosition; onMove: (x: number, y: number) => void; artworkClassName?: string; active: boolean }) { const [dragging, setDragging] = useState<{ x: number; y: number; originX: number; originY: number } | null>(null); const artwork = <img src={src} alt={`${name} render`} draggable="false" />; return <div className={`reference-render-layer ${className}${active ? " is-active" : ""}`} role="button" aria-label={`${name} — drag to position`} aria-disabled={!active} style={{ transform: `translate(${position.x}%, ${position.y}%)` }} onPointerDown={e => { if (!active) return; e.currentTarget.setPointerCapture(e.pointerId); setDragging({ x: e.clientX, y: e.clientY, originX: position.x, originY: position.y }); }} onPointerMove={e => { if (!dragging) return; const stage = e.currentTarget.parentElement?.getBoundingClientRect(); if (!stage?.width || !stage.height) return; onMove(dragging.originX + ((e.clientX - dragging.x) / stage.width) * 100, dragging.originY + ((e.clientY - dragging.y) / stage.height) * 100); }} onPointerUp={() => setDragging(null)} onPointerCancel={() => setDragging(null)}>{artworkClassName ? <div className={artworkClassName}>{artwork}</div> : artwork}</div>; }
+function DraggableRender({ name, className, src, position, artworkClassName, onImageRef }: { name: string; className: string; src: string; position: RenderPosition; artworkClassName?: string; onImageRef?: (image: HTMLImageElement | null) => void }) { const artwork = <img ref={onImageRef} src={src} alt={`${name} render`} draggable="false" />; return <div className={`reference-render-layer ${className}`} style={{ transform: `translate(${position.x}%, ${position.y}%)` }}>{artworkClassName ? <div className={artworkClassName}>{artwork}</div> : artwork}</div>; }
 function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [blend, setBlend] = useState("Fitted"), [color, setColor] = useState("Bone Cattleman"), [base, setBase] = useState("None"), [layerOne, setLayerOne] = useState("None"), [layerTwo, setLayerTwo] = useState("None"), [tie, setTie] = useState("Tie On The Back"), [feather, setFeather] = useState("None"), [initials, setInitials] = useState(""), [additional, setAdditional] = useState("No"), [additionalText, setAdditionalText] = useState(""), [symbol, setSymbol] = useState("None"), [brandingComments, setBrandingComments] = useState(""), [charm, setCharm] = useState("None"), [size, setSize] = useState("6 7/8"), [comments, setComments] = useState("");
   const [bandPositions, setBandPositions] = useState({ base: { x: 0, y: 0 }, layerOne: { x: 0, y: 0 }, layerTwo: { x: 0, y: 0 } }), [featherPosition, setFeatherPosition] = useState({ x: 0, y: 0 }), [charmPosition, setCharmPosition] = useState({ x: 0, y: 0 }), [activeLayer, setActiveLayer] = useState<MovableLayer | null>(null);
+  const layerImages = useRef<Partial<Record<MovableLayer, HTMLImageElement | null>>>({});
+  const alphaCanvases = useRef<Partial<Record<MovableLayer, HTMLCanvasElement>>>({});
+  const [draggingLayer, setDraggingLayer] = useState<{ key: MovableLayer; x: number; y: number; origin: RenderPosition } | null>(null);
   const baseBandsAll = ["None", ...Object.keys(baseBandAssets)], layeredBandsAll = ["None", ...Object.keys(layeredBandAssets)];
   const feathersAll = ["None", ...Object.keys(featherAssets)];
   const symbolsAll = ["None", "Horseshoe", "Cactus", "Longhorn 1", "Longhorn 2", "Cross 1", "Cross 2", "Heart Outline", "Heart", "Curve", "Sun", "Arrow", "Golf Pin", "Guns Crossed", "Cowboy", "Cowboy Boot", "Snake", "Buffalo", "Bear", "Horn 1", "Horn 2", "Duck", "Wave", "Butterfly", "Flower", "Star", "Lightning Bolt", "Mountains"];
@@ -47,13 +50,50 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
   const chooseShape = (shape: string) => { setBlend(shape); setColor(Object.keys(cowboyHatRenders[shape])[0]); };
   const reset = () => { setBlend("Fitted"); setColor("Bone Cattleman"); setBase("None"); setLayerOne("None"); setLayerTwo("None"); setTie("Tie On The Back"); setFeather("None"); setInitials(""); setAdditional("No"); setAdditionalText(""); setSymbol("None"); setBrandingComments(""); setCharm("None"); setSize("6 7/8"); setComments(""); setBandPositions({ base: { x: 0, y: 0 }, layerOne: { x: 0, y: 0 }, layerTwo: { x: 0, y: 0 } }); setFeatherPosition({ x: 0, y: 0 }); setCharmPosition({ x: 0, y: 0 }); setActiveLayer(null); };
   const setBand = (key: "base" | "layerOne" | "layerTwo") => (x: number, y: number) => setBandPositions(p => ({ ...p, [key]: { x, y } }));
+  const positions: Record<MovableLayer, RenderPosition> = { feather: featherPosition, base: bandPositions.base, layerOne: bandPositions.layerOne, layerTwo: bandPositions.layerTwo, charm: charmPosition };
+  const isPresent: Record<MovableLayer, boolean> = { feather: feather !== "None", base: base !== "None", layerOne: layerOne !== "None", layerTwo: layerTwo !== "None", charm: charm !== "None" };
+  const moveLayer = (key: MovableLayer, x: number, y: number) => { if (key === "base" || key === "layerOne" || key === "layerTwo") setBand(key)(x, y); else if (key === "feather") setFeatherPosition({ x, y }); else setCharmPosition({ x, y }); };
+  const hasVisibleBandPixel = (key: MovableLayer, x: number, y: number) => {
+    if (!isPresent[key] || !["base", "layerOne", "layerTwo"].includes(key)) return false;
+    const image = layerImages.current[key];
+    if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return false;
+    const localX = x - positions[key].x, localY = y - positions[key].y;
+    if (localX < 0 || localX > 100 || localY < 0 || localY > 100) return false;
+    let canvas = alphaCanvases.current[key];
+    if (!canvas || canvas.dataset.source !== image.currentSrc) {
+      canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      canvas.dataset.source = image.currentSrc;
+      canvas.getContext("2d", { willReadFrequently: true })?.drawImage(image, 0, 0);
+      alphaCanvases.current[key] = canvas;
+    }
+    const px = Math.min(canvas.width - 1, Math.max(0, Math.round((localX / 100) * (canvas.width - 1))));
+    const py = Math.min(canvas.height - 1, Math.max(0, Math.round((localY / 100) * (canvas.height - 1))));
+    try { return (canvas.getContext("2d", { willReadFrequently: true })?.getImageData(px, py, 1, 1).data[3] ?? 0) > 24; } catch { return false; }
+  };
+  const startStageDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100, y = ((e.clientY - rect.top) / rect.height) * 100;
+    const directHit = (["layerTwo", "layerOne", "base"] as MovableLayer[]).find(key => hasVisibleBandPixel(key, x, y));
+    const key = directHit ?? activeLayer;
+    if (!key || !isPresent[key]) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setActiveLayer(key);
+    setDraggingLayer({ key, x: e.clientX, y: e.clientY, origin: positions[key] });
+  };
+  const continueStageDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingLayer) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    moveLayer(draggingLayer.key, draggingLayer.origin.x + ((e.clientX - draggingLayer.x) / rect.width) * 100, draggingLayer.origin.y + ((e.clientY - draggingLayer.y) / rect.height) * 100);
+  };
   const selectMovable = (layer: MovableLayer, setter: (value: string) => void) => (value: string) => { setter(value); setActiveLayer(value === "None" ? null : layer); };
   const movableLayers: Array<[MovableLayer, string]> = [["feather", "Feather"], ["base", "Base band"], ["layerOne", "Band 1"], ["layerTwo", "Band 2"], ["charm", "Charm"]].filter(([key]) => ({ feather, base, layerOne, layerTwo, charm })[key] !== "None") as Array<[MovableLayer, string]>;
   return <div className="reference-customizer" role="dialog" aria-modal="true" aria-label="Cava custom hat builder">
     <div className="reference-preview">
       <div className="reference-preview-tools"><button aria-label="Zoom preview">⊕</button><button aria-label="Share design">↥</button><button aria-label="Start over" onClick={reset}>↻</button></div>
       <div className="reference-hat-frame">
-        <div className="reference-hat-stage">
+        <div className="reference-hat-stage" onPointerDown={startStageDrag} onPointerMove={continueStageDrag} onPointerUp={() => setDraggingLayer(null)} onPointerCancel={() => setDraggingLayer(null)}>
           <img className="reference-base-render" src={render} alt={`${color} ${blend} hat render`}/>
           {feather !== "None" && <DraggableRender
             name={`${feather} feather`}
@@ -61,32 +101,28 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
             artworkClassName="reference-feather-transform"
             src={featherAssets[feather]}
             position={featherPosition}
-            onMove={(x, y) => setFeatherPosition({ x, y })}
-            active={activeLayer === "feather"}
+            onImageRef={image => { layerImages.current.feather = image; }}
           />}
           {base !== "None" && <DraggableRender
             name={`${base} base band`}
             className="reference-base-band"
             src={baseBandAssets[base]}
             position={bandPositions.base}
-            onMove={setBand("base")}
-            active={activeLayer === "base"}
+            onImageRef={image => { layerImages.current.base = image; }}
           />}
           {layerOne !== "None" && <DraggableRender
             name={`${layerOne} layered band one`}
             className="reference-layer-one"
             src={layeredBandAssets[layerOne]}
             position={bandPositions.layerOne}
-            onMove={setBand("layerOne")}
-            active={activeLayer === "layerOne"}
+            onImageRef={image => { layerImages.current.layerOne = image; }}
           />}
           {layerTwo !== "None" && <DraggableRender
             name={`${layerTwo} layered band two`}
             className="reference-layer-two"
             src={layeredBandAssets[layerTwo]}
             position={bandPositions.layerTwo}
-            onMove={setBand("layerTwo")}
-            active={activeLayer === "layerTwo"}
+            onImageRef={image => { layerImages.current.layerTwo = image; }}
           />}
           {charm !== "None" && <DraggableRender
             name={`${charm} charm`}
@@ -94,8 +130,7 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
             artworkClassName="reference-charm-transform"
             src={charmAssets[charm]}
             position={charmPosition}
-            onMove={(x, y) => setCharmPosition({ x, y })}
-            active={activeLayer === "charm"}
+            onImageRef={image => { layerImages.current.charm = image; }}
           />}
           <div className="reference-initials">{initials}</div>
         </div>

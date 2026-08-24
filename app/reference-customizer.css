@@ -21,10 +21,11 @@
 .reference-feather-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(15%,-7%) rotate(51.332deg) scale(.45);transform-origin:center;pointer-events:none}
 .reference-feather-transform img{width:100%;height:100%;object-fit:contain}
 
-/* Full-canvas transparent artwork overlaps, so only the layer selected in the
-   picker should receive drag gestures. This keeps every layer reachable. */
-.reference-render-layer:not(.is-active){pointer-events:none}
-.reference-render-layer.is-active{pointer-events:auto}
+/* The stage owns pointer input. Transparent pixels are alpha-tested in code,
+   so a newer full-canvas export can never block an older visible band. */
+.reference-hat-stage{touch-action:none;cursor:grab}
+.reference-hat-stage:active{cursor:grabbing}
+.reference-render-layer,.reference-render-layer img{pointer-events:none!important}
 .reference-layer-editor{position:sticky;top:-26px;z-index:9;margin:10px 0 0;padding:18px 0 16px;background:rgba(255,255,255,.97);border-bottom:1px solid #b9b1a9;box-shadow:0 8px 14px rgba(255,255,255,.92)}
 .reference-layer-editor>div{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:12px}
 .reference-layer-editor b{font-size:17px;letter-spacing:-.02em}.reference-layer-editor span{font-size:13px;color:#716b66}
