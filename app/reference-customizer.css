@@ -20,3 +20,19 @@
 .reference-feather-layer{z-index:4}
 .reference-feather-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(15%,-7%) rotate(51.332deg) scale(.45);transform-origin:center;pointer-events:none}
 .reference-feather-transform img{width:100%;height:100%;object-fit:contain}
+
+/* Full-canvas transparent artwork overlaps, so only the layer selected in the
+   picker should receive drag gestures. This keeps every layer reachable. */
+.reference-render-layer:not(.is-active){pointer-events:none}
+.reference-render-layer.is-active{pointer-events:auto}
+.reference-layer-picker{position:absolute;top:18px;right:3%;z-index:14;display:flex;gap:5px;max-width:64%;overflow-x:auto;scrollbar-width:none}
+.reference-layer-picker::-webkit-scrollbar{display:none}
+.reference-layer-picker button{flex:0 0 auto;border:1px solid #b9b1a9;background:rgba(255,255,255,.94);color:#302a26;padding:7px 9px;font:600 10px/1 Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
+.reference-layer-picker button.active{border-color:#392c22;background:#392c22;color:#fff}
+
+/* Rancher's small-accessory print area is about one tenth of the product
+   canvas and sits at the lower-right edge of the crown. */
+.reference-charm-transform{position:absolute;inset:0;width:100%;height:100%;transform:translate(24%,9%) scale(.07);transform-origin:center;pointer-events:none}
+.reference-charm-transform img{width:100%;height:100%;object-fit:contain}
+
+@media(max-width:800px){.reference-layer-picker{top:auto;right:3%;bottom:39px;max-width:94%;padding-left:4px}.reference-layer-picker button{padding:6px 8px;font-size:9px}}
