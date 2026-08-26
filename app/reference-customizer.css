@@ -26,6 +26,7 @@
 .reference-hat-stage{touch-action:none;cursor:grab}
 .reference-hat-stage:active{cursor:grabbing}
 .reference-render-layer,.reference-render-layer img{pointer-events:none!important}
+.reference-drag-status{position:absolute;left:50%;bottom:30px;z-index:14;max-width:calc(100% - 24px);padding:8px 12px;transform:translateX(-50%);border:1px solid rgba(45,23,15,.25);border-radius:999px;background:rgba(255,255,255,.94);color:#2d170f;font-size:11px;font-weight:700;letter-spacing:.06em;text-align:center;text-transform:uppercase;pointer-events:none}
 .reference-layer-editor{position:sticky;top:-26px;z-index:9;margin:10px 0 0;padding:18px 0 16px;background:rgba(255,255,255,.97);border-bottom:1px solid #b9b1a9;box-shadow:0 8px 14px rgba(255,255,255,.92)}
 .reference-layer-editor>div{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:12px}
 .reference-layer-editor b{font-size:17px;letter-spacing:-.02em}.reference-layer-editor span{font-size:13px;color:#716b66}

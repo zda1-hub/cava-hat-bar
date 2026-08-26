@@ -42,7 +42,10 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
   const [bandPositions, setBandPositions] = useState({ base: { x: 0, y: 0 }, layerOne: { x: 0, y: 0 }, layerTwo: { x: 0, y: 0 } }), [featherPosition, setFeatherPosition] = useState({ x: 0, y: 0 }), [charmPosition, setCharmPosition] = useState({ x: 0, y: 0 }), [activeLayer, setActiveLayer] = useState<MovableLayer | null>(null);
   const layerImages = useRef<Partial<Record<MovableLayer, HTMLImageElement | null>>>({});
   const alphaCanvases = useRef<Partial<Record<MovableLayer, HTMLCanvasElement>>>({});
-  const [draggingLayer, setDraggingLayer] = useState<{ key: MovableLayer; x: number; y: number; origin: RenderPosition } | null>(null);
+  // Keep the active drag in a ref as well as React state. On touch screens the
+  // first move can arrive before React has rendered a state update from
+  // pointerdown; the ref makes the layer movable from the very first pixel.
+  const draggingLayerRef = useRef<{ key: MovableLayer; x: number; y: number; origin: RenderPosition } | null>(null);
   const baseBandsAll = ["None", ...Object.keys(baseBandAssets)], layeredBandsAll = ["None", ...Object.keys(layeredBandAssets)];
   const feathersAll = ["None", ...Object.keys(featherAssets)];
   const symbolsAll = ["None", "Horseshoe", "Cactus", "Longhorn 1", "Longhorn 2", "Cross 1", "Cross 2", "Heart Outline", "Heart", "Curve", "Sun", "Arrow", "Golf Pin", "Guns Crossed", "Cowboy", "Cowboy Boot", "Snake", "Buffalo", "Bear", "Horn 1", "Horn 2", "Duck", "Wave", "Butterfly", "Flower", "Star", "Lightning Bolt", "Mountains"];
@@ -80,20 +83,22 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
     if (!key || !isPresent[key]) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     setActiveLayer(key);
-    setDraggingLayer({ key, x: e.clientX, y: e.clientY, origin: positions[key] });
+    draggingLayerRef.current = { key, x: e.clientX, y: e.clientY, origin: positions[key] };
   };
   const continueStageDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const draggingLayer = draggingLayerRef.current;
     if (!draggingLayer) return;
     const rect = e.currentTarget.getBoundingClientRect();
     moveLayer(draggingLayer.key, draggingLayer.origin.x + ((e.clientX - draggingLayer.x) / rect.width) * 100, draggingLayer.origin.y + ((e.clientY - draggingLayer.y) / rect.height) * 100);
   };
+  const endStageDrag = () => { draggingLayerRef.current = null; };
   const selectMovable = (layer: MovableLayer, setter: (value: string) => void) => (value: string) => { setter(value); setActiveLayer(value === "None" ? null : layer); };
   const movableLayers: Array<[MovableLayer, string]> = [["feather", "Feather"], ["base", "Base band"], ["layerOne", "Band 1"], ["layerTwo", "Band 2"], ["charm", "Charm"]].filter(([key]) => ({ feather, base, layerOne, layerTwo, charm })[key] !== "None") as Array<[MovableLayer, string]>;
   return <div className="reference-customizer" role="dialog" aria-modal="true" aria-label="Cava custom hat builder">
     <div className="reference-preview">
       <div className="reference-preview-tools"><button aria-label="Zoom preview">⊕</button><button aria-label="Share design">↥</button><button aria-label="Start over" onClick={reset}>↻</button></div>
       <div className="reference-hat-frame">
-        <div className="reference-hat-stage" onPointerDown={startStageDrag} onPointerMove={continueStageDrag} onPointerUp={() => setDraggingLayer(null)} onPointerCancel={() => setDraggingLayer(null)}>
+        <div className="reference-hat-stage" onPointerDown={startStageDrag} onPointerMove={continueStageDrag} onPointerUp={endStageDrag} onPointerCancel={endStageDrag}>
           <img className="reference-base-render" src={render} alt={`${color} ${blend} hat render`}/>
           {feather !== "None" && <DraggableRender
             name={`${feather} feather`}
@@ -134,6 +139,7 @@ function SimpleCustomizer({ onClose, onSaved }: { onClose: () => void; onSaved: 
           />}
           <div className="reference-initials">{initials}</div>
         </div>
+        {activeLayer && <div className="reference-drag-status" aria-live="polite">Moving {movableLayers.find(([key]) => key === activeLayer)?.[1]} — drag anywhere in the preview</div>}
         <div className="reference-selection-label">{blend} · {color} · {base} · {layerOne} · {layerTwo}</div>
       </div>
       <button className="reference-add" onClick={onSaved}>Add to cart · ${price}.00</button>
