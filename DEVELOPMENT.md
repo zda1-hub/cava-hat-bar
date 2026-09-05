@@ -1,5 +1,11 @@
 # Cava development storefront
 
+## Company preview on GitHub Pages
+
+Website: https://zda1-hub.github.io/cava-hat-bar/
+
+Find the live link in the repository under Settings → Pages → Visit site. Changes pushed to `main` automatically rebuild and publish through the Publish Cava website workflow. `vite.pages.config.ts` builds the same storefront as a browser-only preview, with rendering paths adjusted for the GitHub project URL. The Sites deployment remains separate.
+
 This is a development preview. No payments are collected, no orders are placed, and no confirmation emails are sent.
 
 The bag is saved only in the current browser (`cava-development-bag`). Each custom design stores hat style, color, size, base band, both layered bands, feather, charm, initials, per-piece position/rotation/scale, tie instructions, notes, and preview total. Edit design opens the saved configuration; it does not flatten the artwork.
