@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cowboyHatRenders, baseBandAssets, layeredBandAssets, featherAssets, charmAssets } from "./hat-assets";
 import "./hat-editor.css";
+import BrandLogo from './brand-logo';
 
 type Piece = { id: string; label: string; name: string; src?: string; text?: string; x: number; y: number; angle: number; scale: number; kind: string };
 type Raster = { url: string; x: number; y: number; w: number; h: number };
@@ -78,7 +79,7 @@ export default function HatEditor({onClose,onSave,initial}:{onClose:()=>void;onS
  const select=(id:string,label:string,assets:Record<string,string>,kind:string)=> <section className="hat-option-section"><label htmlFor={`pick-${id}`}>{label}<span>+$8</span></label><select id={`pick-${id}`} value={pieces.find(p=>p.id===id)?.name??'None'} onChange={e=>choose(id,label,e.target.value,assets[e.target.value],kind)}><option>None</option>{Object.keys(assets).map(n=><option key={n}>{n}</option>)}</select></section>;
  const grid=(id:string,label:string,assets:Record<string,string>,kind:string)=><section className="hat-option-section"><h3>{label}<span>+$8</span></h3><div className="hat-choice-grid"><ImageChoice name="None" selected={!pieces.some(p=>p.id===id)} onClick={()=>choose(id,label,'None',undefined,kind)}/>{Object.entries(assets).map(([name,src])=><ImageChoice key={name} name={name} src={src} kind={kind} selected={pieces.some(p=>p.id===id&&p.name===name)} onClick={()=>choose(id,label,name,src,kind)}/>)}</div></section>;
  return <div className="hat-modal-backdrop"><div className="hat-modal" role="dialog" aria-modal="true" aria-label="Design your Cava hat">
-  <header className="hat-modal-head"><b>CAVA <span>HAT BAR</span></b><span>YOUR HAT. YOUR WAY.</span><button aria-label="Close customizer" onClick={onClose}>×</button></header>
+  <header className="hat-modal-head"><BrandLogo/><span>YOUR HAT. YOUR WAY.</span><button aria-label="Close customizer" onClick={onClose}>×</button></header>
   <div className="hat-editor-layout"><section className="hat-preview">
    <div className="hat-preview-toolbar"><button aria-label="Zoom hat" aria-pressed={zoom} onClick={()=>setZoom(!zoom)}>{zoom?'−':'+'}</button><button disabled={!history.length} onClick={()=>{setPieces(history[history.length-1]);setHistory(h=>h.slice(0,-1))}}>↶ Undo</button><button disabled={!pieces.length} onClick={()=>{remember();setPieces([]);setActive(null)}}>Start over</button><strong>${total}.00</strong></div>
    <div className={`hat-stage-wrap ${zoom?'zoomed':''}`}><div className="hat-stage" onPointerDown={()=>setActive(null)}><img className="hat-photo" src={cowboyHatRenders[shape][color]} alt={`${color} hat`} draggable={false}/>{pieces.map(piece=><PieceView key={piece.id} piece={piece} active={active===piece.id} onSelect={()=>setActive(piece.id)} onBegin={remember} onChange={p=>update(piece.id,p)}/>)}</div></div>

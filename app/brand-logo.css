@@ -1,0 +1,7 @@
+.cava-brand-badge{display:block;position:relative;width:100px;height:100px;flex-shrink:0;overflow:hidden;border-radius:50%;background:#1b1008}
+.cava-brand-badge>img{position:absolute;display:block;width:151.9355%!important;height:auto!important;max-width:none!important;left:-25.8065%;top:-93.0645%;object-fit:initial!important}
+.cava-store .cava-header{padding-top:10px;padding-bottom:10px}
+.cava-store .cava-logo .cava-brand-badge{width:100px;height:100px}
+.cava-store .cava-footer .cava-brand-badge{width:136px;height:136px}
+.hat-modal .hat-modal-head .cava-brand-badge{width:56px;height:56px}
+@media(max-width:760px){.cava-store .cava-logo .cava-brand-badge{width:78px;height:78px}.cava-store .cava-footer .cava-brand-badge{width:120px;height:120px}.hat-modal .hat-modal-head .cava-brand-badge{width:44px;height:44px}}
