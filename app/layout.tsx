@@ -6,6 +6,7 @@ import "./store-overrides.css";
 import "./color-overrides.css";
 import "./simple-builder.css";
 import "./rancher-placeholder.css";
+import "./reference-customizer.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
